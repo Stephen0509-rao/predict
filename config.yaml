@@ -1,0 +1,44 @@
+# 项目配置（可被环境变量覆盖，见 src/config.py）
+
+paths:
+  # 多联赛合并（五大联赛等）；仅德甲见 data/bundesliga_football_data_5y.csv
+  data_csv: data/multi_league_football_data_5y.csv
+  ml_bundle: models/ml_bundle.joblib
+  # 多联赛本地库（SQLite）；API 同步脚本写入此库后，预测时按联赛代码读取
+  database_url: sqlite:///data/football.db
+
+# 训练与 Streamlit 共用：统一时间下界、队名表（见 src.config.resolve_data_pipeline）
+data:
+  # 多联赛同时保留的起始时间（含当日）；各联赛早期不足该区间的场次丢弃。设为 null 关闭。
+  kickoff_on_or_after: "2021-08-01"
+  team_aliases_path: data/team_aliases.yaml
+
+# 不同联赛使用不同 joblib（与 CSV 中 Div 一致）。未列出或文件不存在时回退 paths.ml_bundle。
+# 批量训练: python scripts/train_all_leagues.py --data data/multi_league_football_data_5y.csv --leagues D1 E0 SP1 I1 F1
+league_models:
+  D1: models/ml_bundle_D1.joblib
+  E0: models/ml_bundle_E0.joblib
+  SP1: models/ml_bundle_SP1.joblib
+  I1: models/ml_bundle_I1.joblib
+  F1: models/ml_bundle_F1.joblib
+  E1: models/ml_bundle_E1.joblib
+
+training:
+  last_n: 5
+  train_frac: 0.65
+  val_frac: 0.15
+  test_frac: 0.2
+  random_state: 42
+  calibration_method: isotonic
+  blend_poisson_weight: 0.35
+  dixon_coles_rho: -0.13
+  use_dixon_coles: true
+  regression_mode: total_diff
+  cv_splits: 5
+  # 滚动时间序列 CV（TimeSeriesSplit）：为 true 时指标里会多一节 cv（均值±方差），训练明显变慢
+  run_cv: false
+
+model:
+  rf_n_estimators: 300
+  rf_max_depth: 12
+  class_weight: balanced_subsample

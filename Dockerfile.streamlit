@@ -1,0 +1,18 @@
+# 桌面版 Streamlit（云端若需大屏界面请用此镜像）
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1
+ENV FOOTBALL_CONFIG=/app/config.yaml
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV PORT=8501
+EXPOSE 8501
+
+CMD ["sh", "-c", "python -m streamlit run app/app.py --server.address=0.0.0.0 --server.port=${PORT} --server.headless=true"]

@@ -1,0 +1,13 @@
+# Render.com Blueprint：连接 Git 仓库后可用此文件一键创建 Web Service
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: football-predict
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    healthCheckPath: /health
